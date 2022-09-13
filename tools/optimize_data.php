@@ -414,6 +414,12 @@ function updateNotMobi($conn) {
 	$sql = "update game set g_not_mobi = 1 where g_type = 'WebGL' and g_site = 'https://y8.com';";
 	$conn->query($sql);
 }
+
+function addCatT($conn) {
+	$sql = "insert into game_cat_t (g_cat_t_name, g_cat_t_slug) values 
+			();";
+	$conn->query($sql);
+}
 // updateNotMobi($conn);
 // deleteDupplicate($conn);
 addFreeGame($conn);

@@ -3469,12 +3469,14 @@ $arr_page2 = array(
 
 ob_implicit_flush(true); // Support sleep()/usleep()
 ob_end_flush(); // Support sleep()/usleep()
-for ($p = 0; $p < sizeof($arr_page); $p++) {
-    $page = $arr_page[$p];
-    myParseContent($conn_kiddy, $page);
+
+$arr_page_u = array_unique($arr_page);
+for ($p = 0; $p < sizeof($arr_page_u); $p++) {
+    $page = $arr_page_u[$p];
+    myParseContent2($conn_kiddy, $page);
     usleep(300);
 }
-//myParseContent($conn, $site.$arr_page[0]);
+
 $conn_kiddy->close();
 
 function myParseContent($conn, $page) {
@@ -3527,6 +3529,24 @@ function myParseContent($conn, $page) {
     $play_time = rand(21, 1144);
 
     saveDB($conn, $title, $s_title, $dimension, $type, $vote, $vote_time, $play_time, 0, $link, 'https://gamedistribution.com', $author, 28, 0, 0, 0, 0, $desc, $guide, $thumb, 1);
+}
+
+
+function myParseContent2($conn, $page) {
+    $xpath = myDOMXPath($page);
+
+    $el_link = $xpath->query('//div[@class="input-container input-location"]/a');
+        $link = $el_link->item(0) ? $el_link->item(0)->getAttribute('href') : '';
+        $link .= '?gd_sdk_referrer_url='.$page;
+    echo $link.'<br />';
+
+    $el_cat = $xpath->query('//div[span/text() = "Categories"]/span/a');
+        $cat = $el_cat->item(0) ? $el_cat->item(0)->textContent : '';
+        $cat_2 = $el_cat->item(1) ? $el_cat->item(1)->textContent : '';
+    $cat_tag = $cat == 'Puzzle' ? $cat_2 : $cat;
+    echo $cat_tag.'<br />';
+
+    updateDB($conn, $link, $cat_tag);
 }
 
 ?>

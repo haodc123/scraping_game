@@ -4,7 +4,8 @@ require_once('_common.php');
 $conn->close();
 
 $arr_cats = array(
-28 => array("https://www.crazygames.com/c/puzzle"));
+28 => array("https://www.crazygames.com/c/puzzle"),
+65 => array("https://www.crazygames.com/t/board"));
 
 $arr_cats2 = array(
 66 => array("https://kids.crazygames.com/")); // kids
@@ -20,7 +21,7 @@ function getListAllGame($conn, $arr_cats) {
     for ($i=28; $i<70; $i++) {
         if (isset($arr_cats[$i])) {
             $arr_link[$i] = array();
-            for ($k=10; $k<20; $k++) { // pagination
+            for ($k=2; $k<20; $k++) { // pagination
                 array_push($arr_link[$i], getListGameByCat($conn, $i, $arr_cats[$i][0].'/'.$k));
 				
             }
@@ -40,7 +41,7 @@ function getListAllGame2($conn, $arr_cats2) { // kids
     for ($i=28; $i<70; $i++) {
         if (isset($arr_cats2[$i])) {
             $arr_link[$i] = array();
-            array_push($arr_link[$i], getListGameByCat2($conn, $i, $arr_cats2[$i][0]));
+            array_push($arr_link[$i], getListGameByCat($conn, $i, $arr_cats2[$i][0]));
         }	
         usleep(400);
     }
@@ -65,7 +66,7 @@ function getListGameByCat($conn, $cat, $page) { // input to game_page
                 $title = mysqli_real_escape_string($conn, $el_title->item($i) ? $el_title->item($i)->textContent : '');
                 echo $title.' - '.$thumb.' - '.$link.' - '.makeThumbName($title, $thumb).'<br />';
                 array_push($arr_games_each_cat, $link);
-                file_put_contents('../res/thumb_kiddy/crazygames/'.makeThumbName($title, $thumb), file_get_contents($thumb));
+                // file_put_contents('../res/thumb_kiddy/crazygames/'.makeThumbName($title, $thumb), file_get_contents($thumb));
                 saveDBPage($conn, 'crazygames.com', $link, $cat, makeThumbName($title, $thumb), 'Unknown');
             
         
@@ -110,9 +111,9 @@ function getAllGameDetail($conn) { // input to game
             $arr_game = array();
             array_push($arr_game, $row[2], $row[3], $row[4]);
             array_push($arr_games, $arr_game);
-            myParseContent($conn, $row[2], $row[3], $row[4]);
+            myParseContent3($conn, $row[2], $row[3], $row[4]);
             usleep(300);
-			break;
+			
         }
         $result -> free_result();
     }
@@ -156,7 +157,20 @@ function myParseContent($conn, $page, $cat, $thumb) {
     saveDB($conn, $title, $s_title, 'Unknown', $vote, $vote_time, $play_time, 0, $link, 'https://crazygames.com', $author, $cat, 0, 0, 0, 0, $desc, $guide, $thumb, 1);
 
 }
+function myParseContent3($conn, $page, $cat, $thumb) {
+    $xpath = myDOMXPath($page);
 
+    $el_link = $xpath->query('//iframe[@id="game-iframe"]');
+        $link = $el_link->item(0) ? $el_link->item(0)->getAttribute('src') : '';
+    $el_cat_t = $xpath->query('//div[@class="css-ez83vb"]/div/a');
+        $cat_t_1 = $el_cat_t->item(0) ? $el_cat_t->item(0)->textContent : '';
+        $cat_t_2 = $el_cat_t->item(1) ? $el_cat_t->item(1)->textContent : '';
+
+    echo $page.' - '.$cat_t_2.'-'.$link.'<br /><br />';
+        
+    updateDB($conn, $link, $cat_t_2);
+
+}
 
 function getAllGameDetail2($conn) { // kids
     $arr_games = array();
@@ -205,8 +219,8 @@ function myParseContent2($conn, $page, $cat, $thumb) { // kids
 
 // myParseContent($conn, 'https://www.crazygames.com/game/tuggowar-io', 14, 'abc.png');
 // myParseContent($conn, 'https://www.crazygames.com/game/buildroyale-io', 14, 'abc.png');
-// getListAllGame2($conn_kiddy, $arr_cats2);
-getAllGameDetail2($conn_kiddy);
+// getListAllGame($conn_kiddy, $arr_cats);
+getAllGameDetail($conn_kiddy);
 
 // getAllGameDetail($conn);
 // myParseContent($conn, 'https://www.trochoi.net/trò+chơi/solitaire-klondike-2.html', 3, 'abc.png');

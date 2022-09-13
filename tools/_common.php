@@ -129,7 +129,14 @@ function saveDB($conn, $title, $t_slug, $dimension, $type, $vote, $vote_time, $p
           echo "Error: " . $sql . "<br>" . $conn->error;
         }
 }
-
+function updateDB($conn, $link, $cat_t) {
+    $sql = "UPDATE game SET g_cat_t = '".$cat_t."' WHERE g_link = '".$link."'";
+    if ($conn->query($sql) === TRUE) {
+      echo "Record updated successfully";
+    } else {
+      echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
 function saveDBPage($conn, $platform, $page, $cat, $thumb, $type) {
         $sql = "INSERT IGNORE INTO game_page (platform, page, cat, thumb, type)
     VALUES ('".$platform."', '".$page."', '".$cat."', '".$thumb."', '".$type."')";
