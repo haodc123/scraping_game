@@ -2,14 +2,7 @@
 
 require_once('_common.php');
 
-// $a = " \n  abc vgf cc   \n ";
-
-
-// var_dump($a);
-// var_dump(removeHeadTail($a));
-
-
-
+saveDB($conn, "title", "s_title", "Unknown", 2, 2, 2, 0, 0, "link", "https://crazygames.com", "author", 2, 0, 0, 0, 0, "desc", "guide", "thumb", 1, 0);
 
 
 

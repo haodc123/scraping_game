@@ -4,7 +4,7 @@
     $username = "root";
     $password = "";
     $dbname = "tflashgame";
-    $dbname_kiddy = "kiddy_intelligent";
+    $dbname_kiddy = "flash_intelligent";
 
     // Create connection
     $conn = new mysqli($servername, $username, $password, $dbname);
@@ -94,41 +94,140 @@ function makeThumbName($title, $thumb_link) {
         return slugify($title).'.jpg';
     }
 }
-function saveDB($conn, $title, $t_slug, $dimension, $type, $vote, $vote_time, $play_time, $hot, $link, $site, $author, $cat1, $cat2, $cat3, $cat4, $g_not_mobi, $desc, $guide, $thumb, $allow_embed) {
-        $sql = "INSERT INTO game (
-            g_title, 
-            g_title_slug, 
-            g_dimension,
-            g_type,
-			g_vote,
-			g_vote_time,
-			g_play_time,
-            g_hot,
-            g_link,
-            g_site,
-            g_for_lang,
-            g_author,
-            g_cat_1,
-            g_cat_2,
-            g_cat_3,
-            g_cat_4,
-            g_not_mobi,
-            g_desc,
-            g_guide,
-            g_thumb,
-            g_allow_embed,
-            g_status,
-            created_at,
-            updated_at,
-            deleted_at)
-    VALUES ('".$title."', '".$t_slug."', '".$dimension."', '".$type."', ".$vote.", ".$vote_time.", ".$play_time.", ".$hot.", '".$link."', '".$site."', 'en', '".$author."', '".$cat1."', '".$cat2."', '".$cat3."', '".$cat4."', '".$g_not_mobi."', '".$desc."', '".$guide."', '".$thumb."', ".$allow_embed.", 1, NOW(), NOW(), null)";
+function saveDB($conn, $title, $t_slug, $type, $hot, $vote, $vote_time, $play_time, $dimension, $link, $site, $author, $cat1, $cat2, $cat3, $cat4, $g_not_mobi, $desc, $guide, $thumb, $allow_embed, $is_ignore_exist = 1) {
+        if ($is_ignore_exist) // Ignore existing game (same g_link)
+            $sql = "INSERT INTO game (
+                g_title, 
+                g_title_slug, 
+                g_type,
+    			g_hot,
+                g_vote,
+    			g_vote_time,
+    			g_play_time,
+                g_dimension,
+                g_link,
+                g_site,
+                g_for_lang,
+                g_author,
+                g_cat_1,
+                g_cat_2,
+                g_cat_3,
+                g_cat_4,
+                g_not_mobi,
+                g_desc,
+                g_guide,
+                g_thumb,
+                g_allow_embed,
+                g_status,
+                created_at,
+                updated_at,
+                deleted_at)
+            VALUES ('".$title."', '".$t_slug."', '".$type."', ".$hot.", ".$vote.", ".$vote_time.", ".$play_time.", '".$dimension."', '".$link."', '".$site."', 'en', '".$author."', '".$cat1."', '".$cat2."', '".$cat3."', '".$cat4."', '".$g_not_mobi."', '".$desc."', '".$guide."', '".$thumb."', ".$allow_embed.", 1, NOW(), NOW(), null)";
+        else {         // Update existing game
+            $sql = "INSERT INTO game (
+                g_title, 
+                g_title_slug, 
+                g_type,
+                g_hot,
+                g_vote,
+                g_vote_time,
+                g_play_time,
+                g_dimension,
+                g_link,
+                g_site,
+                g_for_lang,
+                g_author,
+                g_cat_1,
+                g_cat_2,
+                g_cat_3,
+                g_cat_4,
+                g_not_mobi,
+                g_desc,
+                g_guide,
+                g_thumb,
+                g_allow_embed,
+                g_status,
+                created_at,
+                updated_at,
+                deleted_at)
+            VALUES ('".$title."', '".$t_slug."', '".$dimension."', '".$type."', ".$vote.", ".$vote_time.", ".$play_time.", ".$hot.", '".$link."', '".$site."', 'en', '".$author."', '".$cat1."', '".$cat2."', '".$cat3."', '".$cat4."', '".$g_not_mobi."', '".$desc."', '".$guide."', '".$thumb."', ".$allow_embed.", 1, NOW(), NOW(), null) 
+            ON DUPLICATE KEY UPDATE g_title='".$title."', g_title_slug='".$t_slug."'"; // todo: plz expand this row, i lazy
+        }
 
         if ($conn->query($sql) === TRUE) {
-          echo "New record created successfully";
+          echo "New record created successfully. <br /><br />";
         } else {
-          echo "Error: " . $sql . "<br>" . $conn->error;
+          echo "Error: " . $sql . "<br />" . $conn->error . "<br /><br />";
         }
 }
+function saveDB_Kiddy($conn, $title, $t_slug, $type, $hot, $vote, $vote_time, $play_time, $dimension, $link, $site, $author, $cat1, $cat2, $cat_yo, $tag, $g_not_mobi, $desc, $guide, $thumb, $allow_embed, $is_ignore_exist = 1) {
+        if ($is_ignore_exist) // Ignore existing game (same g_link)
+            $sql = "INSERT INTO game (
+                g_title, 
+                g_title_slug, 
+                g_type,
+                g_hot,
+                g_vote,
+                g_vote_time,
+                g_play_time,
+                g_dimension,
+                g_link,
+                g_site,
+                g_for_lang,
+                g_author,
+                g_cat_1,
+                g_cat_2,
+                g_cat_yo,
+                g_tag,
+                g_not_mobi,
+                g_desc,
+                g_guide,
+                g_thumb,
+                g_allow_embed,
+                g_status,
+                created_at,
+                updated_at,
+                deleted_at)
+            VALUES ('".$title."', '".$t_slug."', '".$type."', ".$hot.", ".$vote.", ".$vote_time.", ".$play_time.", '".$dimension."', '".$link."', '".$site."', 'en', '".$author."', '".$cat1."', '".$cat2."', '".$cat_yo."', '".$tag."', '".$g_not_mobi."', '".$desc."', '".$guide."', '".$thumb."', ".$allow_embed.", 1, NOW(), NOW(), null)";
+        else {         // Update existing game
+            $sql = "INSERT INTO game (
+                g_title, 
+                g_title_slug, 
+                g_type,
+                g_hot,
+                g_vote,
+                g_vote_time,
+                g_play_time,
+                g_dimension,
+                g_link,
+                g_site,
+                g_for_lang,
+                g_author,
+                g_cat_1,
+                g_cat_2,
+                g_cat_yo,
+                g_tag,
+                g_not_mobi,
+                g_desc,
+                g_guide,
+                g_thumb,
+                g_allow_embed,
+                g_status,
+                created_at,
+                updated_at,
+                deleted_at)
+            VALUES ('".$title."', '".$t_slug."', '".$dimension."', '".$type."', ".$vote.", ".$vote_time.", ".$play_time.", ".$hot.", '".$link."', '".$site."', 'en', '".$author."', '".$cat1."', '".$cat2."', '".$cat3."', '".$cat4."', '".$g_not_mobi."', '".$desc."', '".$guide."', '".$thumb."', ".$allow_embed.", 1, NOW(), NOW(), null) 
+            ON DUPLICATE KEY UPDATE g_title='".$title."', g_title_slug='".$t_slug."'"; // todo: plz expand this row, i lazy
+        }
+
+        if ($conn->query($sql) === TRUE) {
+          echo "Kiddy: New record created successfully. <br /><br />";
+        } else {
+          echo "Kiddy: Error: " . $sql . "<br />" . $conn->error . "<br /><br />";
+        }
+}
+
+
 function updateDB($conn, $link, $cat_t) {
     $sql = "UPDATE game SET g_cat_t = '".$cat_t."' WHERE g_link = '".$link."'";
     if ($conn->query($sql) === TRUE) {
@@ -137,8 +236,8 @@ function updateDB($conn, $link, $cat_t) {
       echo "Error: " . $sql . "<br>" . $conn->error;
     }
 }
-function saveDBPage($conn, $platform, $page, $cat, $thumb, $type) {
-        $sql = "INSERT IGNORE INTO game_page (platform, page, cat, thumb, type)
+function saveDBPage($conn, $platform, $page, $cat, $thumb, $type, $our_site = 'tflash') {
+    $sql = "INSERT IGNORE INTO game_page (platform, page, cat, thumb, type)
     VALUES ('".$platform."', '".$page."', '".$cat."', '".$thumb."', '".$type."')";
 
         if ($conn->query($sql) === TRUE) {
