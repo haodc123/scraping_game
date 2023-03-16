@@ -355,7 +355,7 @@ function common($conn) {
 }
 // updateNotMobi($conn);
 // deleteDupplicate($conn);
-convertCatT($conn_kiddy);
+// convertCatT($conn_kiddy);
 // addFreeGame2($conn);
 // addFreeGame3($conn);
 // addFreeGame4($conn);
@@ -474,7 +474,7 @@ function putNewGameToFile($conn, $last_id) {
 	w_file($arr_data, 'game.xlsx');
 }
 // Step 3
-function putNewGameToLang($conn, $lang = 'vi') {
+function putNewGameToLang($conn, $lang) {
 	// game_$lang.xlsx
 	$data_r = r_file('game_'.$lang.'.xlsx', array(0,1,2,3,4,5));
 	for ($i=0; $i<sizeof($data_r); $i++) {
@@ -483,14 +483,15 @@ function putNewGameToLang($conn, $lang = 'vi') {
 		$title_slug = mysqli_real_escape_string($conn, $data_r[$i][2]);
 		$desc = mysqli_real_escape_string($conn, $data_r[$i][3]);
 		$guide = mysqli_real_escape_string($conn, $data_r[$i][4]);
-		// echo $id.' - '.$title.' - '.$guide.'<br />';
-		$sql_update = "INSERT INTO game_lang (g_id, lang, g_title, g_title_slug, g_desc, g_guide) VALUES (".$id.", 'vi', '".$title."', '".$title_slug."', '".$desc."', '".$guide."')";
+		echo $id.' - '.$title.' - '.$title_slug.' - '.$desc.' - '.$guide.'<br />';
+		$sql_update = "INSERT INTO game_lang (g_id, lang, g_title, g_title_slug, g_desc, g_guide) VALUES (".$id.", '".$lang."', '".$title."', '".$title_slug."', '".$desc."', '".$guide."')";
         $conn -> query($sql_update);
 	}
 }
 
+putNewGameToLang($conn, 'id');
 
-
+$conn->close();
 $conn_kiddy->close();
 
 ?>
