@@ -386,37 +386,68 @@ function common($conn) {
 /**
 * Procedure when insert many categories:
 * 1. Prepare file/gmae_cat.xlsx and Translate game_cat -> game_cat_$lang, carefully check
-* 2. insertNewCat($conn):
-*  2.1. Insert new cat on game_cat.xlsx
-*  2.2. Copy cat to [game_cat_lang]
+* 2. insertNewCat($conn): (*** NOTE: If only add for new lang, just run 2.2
+*  2.1. Read game_cat.xlsx and insert to [game_cat]
+*  2.2. Read game_cat_$lang.xlsx ond insert to [game_cat_lang]
 */
+// Step 1
+function putCatToFile($conn, $last_id) {
+	// game.xlsx
+	$sql_get = "SELECT id, g_cat_name, g_cat_slug, g_cat_tags, g_cat_tags_slug FROM game_cat WHERE id > ".$last_id;
+
+	$arr_data = array();
+    if ($result = $conn -> query($sql_get)) {
+        while ($row = $result -> fetch_row()) {
+			$arr_row = array();
+			$id = $row[0];
+			$g_cat_name = $row[1];
+			$g_cat_slug = $row[2];
+			$g_cat_tags = $row[3];
+			$g_cat_tags_slug = $row[4];
+			array_push($arr_row, $id, $g_cat_name, $g_cat_slug, $g_cat_tags, $g_cat_tags_slug);
+			array_push($arr_data, $arr_row);
+        }
+        $result -> free_result();
+    }
+	
+	print_r('<pre>');
+	print_r($arr_data);
+	print_r('</pre>');
+	
+	w_file($arr_data, 'game_cat.xlsx');
+}
 // Step 2
-function insertNewCat($conn) {
+function insertNewCat($conn, $lang = 'vi') {
 	// Step 2.1
 	putNewCats($conn);
 	// Step 2.2
-	putNewCatsToLang($conn);
+	putNewCatsToLang($conn, $lang);
 }
 function putNewCats($conn) {
 	// game_cat.xlsx
-	$data_r = r_file('game_cat.xlsx', array(0,1));
+	$data_r = r_file('game_cat.xlsx', array(0,1,2,3,4));
 	for ($i=0; $i<sizeof($data_r); $i++) {
 		$id = $data_r[$i][0];
 		$name = $data_r[$i][1];
 		$slug = slugifyUnicode($name);
-		$sql_update = "INSERT INTO game_cat (id, g_cat_name, g_cat_slug) VALUES (".$id.", '".$name."', '".$slug."')";
+		$cat_tags = $data_r[$i][3];
+		$cat_tags_slug = $data_r[$i][4];
+		$sql_update = "INSERT INTO game_cat (id, g_cat_name, g_cat_slug, g_cat_tags, g_cat_tags_slug) VALUES (".$id.", '".$name."', '".$slug."', '".$cat_tags."', '".$cat_tags_slug."')";
         $conn -> query($sql_update);
 	}
 }
-function putNewCatsToLang($conn, $lang = 'vi') {
+function putNewCatsToLang($conn, $lang) {
 	// game_cat_$lang.xlsx
-	$data_r = r_file('game_cat_'.$lang.'.xlsx', array(0,1));
+	$data_r = r_file('game_cat_'.$lang.'.xlsx', array(0,1,2,3,4));
 	for ($i=0; $i<sizeof($data_r); $i++) {
 		$id = $data_r[$i][0];
 		$name = $data_r[$i][1];
 		$slug = slugifyUnicode($name);
-		$sql_update = "INSERT INTO game_cat_lang (g_cat_id, lang, g_cat_name, g_cat_slug) VALUES (".$id.", '".$lang."', '".$name."', '".$slug."')";
+		$cat_tags = $data_r[$i][3];
+		$cat_tags_slug = $data_r[$i][4];
+		$sql_update = "INSERT INTO game_cat_lang (g_cat_id, lang, g_cat_name, g_cat_slug, g_cat_tags, g_cat_tags_slug) VALUES (".$id.", '".$lang."', '".$name."', '".$slug."', '".$cat_tags."', '".$cat_tags_slug."')";
         $conn -> query($sql_update);
+		// echo $cat_tags;
 	}
 }
 
@@ -489,7 +520,7 @@ function putNewGameToLang($conn, $lang) {
 	}
 }
 
-putNewGameToLang($conn, 'id');
+putNewCatsToLang($conn, 'id');
 
 $conn->close();
 $conn_kiddy->close();
